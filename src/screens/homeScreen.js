@@ -6,20 +6,33 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  FlatList,
+  Pressable,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
+import CountDown from 'react-native-countdown-component';
 
 import HomeHeader from '../components/homeHeader';
 import { colors, parameters } from '../global/styles';
+import { filterData, restaurantsData } from '../global/data';
+import { template } from '@babel/core';
+import FoodCard from '../components/foodCard';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export default function HomeScreen() {
   const [delivery, setDelivery] = useState(true);
+  const [indexCheck, setIndexCheck] = useState('0');
 
   return (
     <View style={styles.container}>
       <HomeHeader />
       <ScrollView stickyHeaderIndices={[0]} showsVerticalScrollIndicator={true}>
-        <View>
+        <View
+          style={{ backgroundColor: colors.cardbackground, paddingBottom: 10 }}
+        >
           <View
             style={{
               marginTop: 10,
@@ -96,6 +109,134 @@ export default function HomeScreen() {
         <View style={styles.headerTextView}>
           <Text style={styles.headerText}>Categories</Text>
         </View>
+        <View>
+          <FlatList
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            data={filterData}
+            keyExtractor={(item) => item.id}
+            extraData={indexCheck}
+            renderItem={({ item, index }) => (
+              <Pressable
+                onPress={() => {
+                  setIndexCheck(item.id);
+                }}
+              >
+                <View
+                  style={
+                    indexCheck === item.id
+                      ? { ...styles.smallCardSelected }
+                      : { ...styles.smallCard }
+                  }
+                >
+                  <Image
+                    style={{ height: 60, width: 60, borderRadius: 30 }}
+                    source={item.image}
+                  />
+                  <View>
+                    <Text
+                      style={
+                        indexCheck === item.id
+                          ? { ...styles.smallCardTextSelected }
+                          : { ...styles.smallCardText }
+                      }
+                    >
+                      {item.name}
+                    </Text>
+                  </View>
+                </View>
+              </Pressable>
+            )}
+          />
+        </View>
+        <View style={styles.headerTextView}>
+          <Text style={styles.headerText}>Free Delivery Now</Text>
+        </View>
+        <View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text
+              style={{
+                marginLeft: 15,
+                fontSize: 16,
+                marginTop: -10,
+                marginRight: 5,
+              }}
+            >
+              Options changing in:
+            </Text>
+            <CountDown
+              until={3600}
+              size={14}
+              digitStyle={{ backgroundColor: colors.lightgreen }}
+              digitTxtStyle={{ color: colors.cardbackground }}
+              timeToShow={['M', 'S']}
+              timeLabels={{ m: 'Min', s: 'Sec' }}
+            />
+          </View>
+          <FlatList
+            style={{ marginTop: 10, marginBottom: 10 }}
+            horizontal={true}
+            data={restaurantsData}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={{ marginRight: 5 }}>
+                <FoodCard
+                  screenWidth={SCREEN_WIDTH * 0.8}
+                  images={item.images}
+                  restaurantName={item.restaurantName}
+                  farAway={item.farAway}
+                  businessAddress={item.businessAddress}
+                  averageReview={item.averageReview}
+                  numberOfReview={item.numberOfReview}
+                />
+              </View>
+            )}
+          />
+        </View>
+        <View style={styles.headerTextView}>
+          <Text style={styles.headerText}>Promotions Available</Text>
+        </View>
+        <View>
+          <FlatList
+            style={{ marginTop: 10, marginBottom: 10 }}
+            horizontal={true}
+            data={restaurantsData}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={{ marginRight: 5 }}>
+                <FoodCard
+                  screenWidth={SCREEN_WIDTH * 0.8}
+                  images={item.images}
+                  restaurantName={item.restaurantName}
+                  farAway={item.farAway}
+                  businessAddress={item.businessAddress}
+                  averageReview={item.averageReview}
+                  numberOfReview={item.numberOfReview}
+                />
+              </View>
+            )}
+          />
+        </View>
+        <View style={styles.headerTextView}>
+          <Text style={styles.headerText}>Restaurants in your Area</Text>
+        </View>
+        <View style={{ width: SCREEN_WIDTH, paddingTop: 10 }}>
+          {restaurantsData.map((item) => (
+            <View key={item.id} style={{ paddingBottom: 20 }}>
+              <FoodCard
+                screenWidth={SCREEN_WIDTH * 0.95}
+                images={item.images}
+                restaurantName={item.restaurantName}
+                farAway={item.farAway}
+                businessAddress={item.businessAddress}
+                averageReview={item.averageReview}
+                numberOfReview={item.numberOfReview}
+              />
+            </View>
+          ))}
+        </View>
       </ScrollView>
     </View>
   );
@@ -147,5 +288,33 @@ const styles = StyleSheet.create({
   headerTextView: {
     backgroundColor: colors.grey5,
     paddingVertical: 3,
+  },
+  smallCard: {
+    borderRadius: 30,
+    backgroundColor: colors.grey5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+    width: 80,
+    margin: 10,
+    height: 100,
+  },
+  smallCardSelected: {
+    borderRadius: 30,
+    backgroundColor: colors.buttons,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+    width: 80,
+    margin: 10,
+    height: 100,
+  },
+  smallCardTextSelected: {
+    fontWeight: 'bold',
+    color: colors.cardbackground,
+  },
+  smallCardText: {
+    fontWeight: 'bold',
+    color: colors.grey2,
   },
 });
